@@ -1,114 +1,134 @@
 require 'tmpdir'
-namespace :cando do
-  db_dir = "db"
-  cando_db_config = "#{db_dir}/cando-config.yml"
-  cando_db_migration_dir = "#{db_dir}/cando-migrate"
-  cando_schema = "#{db_dir}/cando-schema.rb"
-  cando_migrations_config = ".cando.standalone_migrations"
+require_relative '../db'
+include Cando
 
+@cando_db_migration_dir = "db/cando-migrations"
+
+namespace :cando do
   desc "Initialize cando (creates db and runs migrations)"
   task :init do
-    puts "Creating cando db configuration files:"
-
-    create_file cando_migrations_config do
-      <<-EOF
-db:
-    seeds: db/cando-seeds.rb
-    migrate: #{cando_db_migration_dir}
-    schema: #{cando_schema}
-config:
-    database: #{cando_db_config}
-
-      EOF
-    end
-
-    create_file "db/cando-migrate/README.txt" do
-"put cando migration files here"
-    end
-
-    if Dir.glob("#{cando_db_migration_dir}/*_create_capabilities.rb").empty?
-      create_file "#{cando_db_migration_dir}/#{Time.now.strftime("%Y%m%d%H%M%S")}_create_capabilities.rb" do
+    if Dir.glob("#{@cando_db_migration_dir}/*_create_capabilities.rb").empty?
+      create_migration :create_capabilities do
         <<-EOF
-  class CreateCapabilities < ActiveRecord::Migration
-    def up
-     create_table :capabilities do |t|
-        t.string  :user_id
-        t.binary  :base
-      end
-
-      add_index :capabilities, :user_id
-    end
-
-    def down
-      drop_table :capabilities
+Sequel.migration do
+  up do
+   create_table :capabilities do
+     String :user_urn, :unique => true, :null => false
+     primary_key :user_urn
     end
   end
+
+  down do
+    drop_table :capabilities
+  end
+end
         EOF
       end
     else
       puts red("skipping first migration file: already exists")
     end
 
-    puts <<-EOF
+    Rake::Task['cando:migrate'].invoke
 
-Basic structure created:
-- store your cando-db config in: #{cando_db_config}
-- put your migrations in #{cando_db_migration_dir}
-- the cando schema will be dumped to #{cando_schema}
+    puts <<EOF
+#{green("Success!")}
+
+In order to add or remove a capability, call
+
+    rake cando:add[<capability_name>]
+    rake cando:rm[<capability_name>]
+
+respectively. If the default value of a new capability should be granted by default, call
+
+    rake cando:add[<capability_name>,true]
 
 EOF
 
-    unless File.exist? cando_db_config
-      puts red("please create db config in #{cando_db_config} and run again")
-      exit 1
-    end
-
-    cando_migrations do
-      Rake::Task['db:create'].invoke
-    end
-
-    puts green("success -- now run 'rake cando:migrate'")
   end
 
   desc "Migrate cando db"
-  task :migrate do
-    cando_migrations do
-      Rake::Task['db:migrate'].invoke(ENV['VERSION'])
+  task :migrate, [:version] do |_, args|
+    Sequel.extension :migration
+
+    if version = args[:version]
+      puts "Migrating to version #{version}"
+      Sequel::Migrator.run(db, @cando_db_migration_dir, { allow_missing_migration_files: true, target: version.to_i } )
+    else
+      puts "Migrating to latest"
+      Sequel::Migrator.run(db, @cando_db_migration_dir, { allow_missing_migration_files: true} )
     end
   end
 
   desc "Add a new capability (pass in capability name with CAPABILITY=<name>)"
-  task :add do
+  task :add, :capability, :grant_by_default do |_, args|
+    unless args.capability
+      puts red("usage: rake cando:add[<capability_name>] / rake cando:add[<capability_name>,true] # grant this capability by default")
+      exit 1
+    end
 
+    grant_by_default = ( args.grant_by_default == "true" )
+
+    create_migration "add_#{args.capability}_capability" do
+      <<-EOF
+Sequel.migration do
+  up do
+    alter_table :capabilities do
+      add_column :#{args.capability}, TrueClass, :null => false, :default => #{grant_by_default}
+    end
+  end
+
+  down do
+    alter_table :capabilities do
+      drop_column :#{args.capability}
+    end
+  end
+end
+      EOF
+    end
   end
 
   desc "Remove capability (pass in capability name with CAPABILITY=<name>)"
-  task :remove do
+  task :remove, :capability do |_, args|
+    unless args.capability
+      puts red("usage: rake cando:remove[<capability_name>]")
+      exit 1
+    end
 
+    unless capabilities.keys.include?(args.capability.to_sym)
+      puts red("capability '#{args.capability}' does not exist")
+      exit 1
+    end
+
+    create_migration "remove_#{args.capability}_capability" do
+      <<-EOF
+Sequel.migration do
+  up do
+    alter_table :capabilities do
+      drop_column :#{args.capability}
+    end
+  end
+
+  down do
+    alter_table :capabilities do
+      add_column :#{args.capability}, TrueClass, :null => false, :default => #{capabilities[args.capability.to_sym]}
+    end
+  end
+end
+
+EOF
+
+    end
   end
 
   desc "List capabilities"
   task :list do
-
-  end
-
-
-  desc "Destroy cando (drops db)"
-  task :destroy do
-    cando_migrations do
-      begin
-        debugger
-        Rake::Task['db:drop'].invoke
-        puts green("dropped db")
-      rescue
-        puts red("dropping db failed -- continuing anyways")
+    capabilities.each do |name, grant_by_default|
+      if grant_by_default
+        puts "#{name}\t(granted by default)"
+      else
+        puts "#{name}"
       end
     end
-
-    mvtmp cando_db_config
-    mvtmp cando_schema
-    mvtmp cando_db_migration_dir
-    mvtmp cando_migrations_config
   end
 end
 
@@ -121,6 +141,15 @@ def mvtmp(file_name)
 
   puts green("moving #{file_name} to #{@@tmp_dir}")
   FileUtils.mv file_name, @@tmp_dir
+end
+
+def create_migration(name)
+  migration_path = "#{@cando_db_migration_dir}/#{Time.now.strftime("%Y%m%d%H%M%S")}_#{name}.rb"
+  create_file migration_path do
+    yield
+  end
+
+  puts "run 'rake cando:migrate' to execute migration"
 end
 
 def create_file(file_name)
@@ -142,16 +171,6 @@ def create_file(file_name)
   else
     FileUtils.touch file_name
   end
-end
-
-def cando_migrations
-  db_env = ENV['DATABASE']
-  ENV['DATABASE'] = "cando"
-
-  require 'standalone_migrations'
-  StandaloneMigrations::Tasks.load_tasks
-  yield
-  ENV['DATABASE'] = db_env
 end
 
 def green(text)
