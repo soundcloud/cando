@@ -19,7 +19,7 @@ Jeweler::Tasks.new do |gem|
   gem.name = "cando"
   gem.homepage = "http://github.com/kesselborn/cando"
   gem.license = "MIT"
-  gem.summary = %Q{Simple capabilities helper}
+  gem.summary = %Q{Simple roles helper}
   gem.description = %Q{cando description}
   gem.email = "daniel@soundcloud.com"
   gem.authors = ["Daniel Bornkessel"]

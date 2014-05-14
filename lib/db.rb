@@ -33,12 +33,16 @@ execute the following (adjust values as fit):
     end
   end
 
-  def capabilities
-    db.schema(:capabilities).inject({}) do |hash, elem|
+  def roles
+    db.schema(:roles).inject({}) do |hash, elem|
       unless elem[1][:primary_key]
         hash[elem[0]] = elem[1][:ruby_default]
       end
       hash
     end
+  end
+
+  def can(user_urn, *roles)
+    
   end
 end

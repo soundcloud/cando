@@ -7,19 +7,19 @@ include Cando
 namespace :cando do
   desc "Initialize cando (creates db and runs migrations)"
   task :init do
-    if Dir.glob("#{@cando_db_migration_dir}/*_create_capabilities.rb").empty?
-      create_migration :create_capabilities do
+    if Dir.glob("#{@cando_db_migration_dir}/*_create_roles.rb").empty?
+      create_migration :create_roles do
         <<-EOF
 Sequel.migration do
   up do
-   create_table :capabilities do
+   create_table :roles do
      String :user_urn, :unique => true, :null => false
      primary_key :user_urn
     end
   end
 
   down do
-    drop_table :capabilities
+    drop_table :roles
   end
 end
         EOF
@@ -33,14 +33,14 @@ end
     puts <<EOF
 #{green("Success!")}
 
-In order to add or remove a capability, call
+In order to add or remove a role, call
 
-    rake cando:add[<capability_name>]
-    rake cando:rm[<capability_name>]
+    rake cando:add[<role_name>]
+    rake cando:rm[<role_name>]
 
-respectively. If the default value of a new capability should be granted by default, call
+respectively. If the default value of a new role should be granted by default, call
 
-    rake cando:add[<capability_name>,true]
+    rake cando:add[<role_name>,true]
 
 EOF
 
@@ -59,27 +59,27 @@ EOF
     end
   end
 
-  desc "Add a new capability (pass in capability name with CAPABILITY=<name>)"
-  task :add, :capability, :grant_by_default do |_, args|
-    unless args.capability
-      puts red("usage: rake cando:add[<capability_name>] / rake cando:add[<capability_name>,true] # grant this capability by default")
+  desc "Add a new role (pass in role name with ROLE=<name>)"
+  task :add, :role, :grant_by_default do |_, args|
+    unless args.role
+      puts red("usage: rake cando:add[<role_name>] / rake cando:add[<role_name>,true] # grant this role by default")
       exit 1
     end
 
     grant_by_default = ( args.grant_by_default == "true" )
 
-    create_migration "add_#{args.capability}_capability" do
+    create_migration "add_#{args.role}_role" do
       <<-EOF
 Sequel.migration do
   up do
-    alter_table :capabilities do
-      add_column :#{args.capability}, TrueClass, :null => false, :default => #{grant_by_default}
+    alter_table :roles do
+      add_column :#{args.role}, TrueClass, :null => false, :default => #{grant_by_default}
     end
   end
 
   down do
-    alter_table :capabilities do
-      drop_column :#{args.capability}
+    alter_table :roles do
+      drop_column :#{args.role}
     end
   end
 end
@@ -87,30 +87,30 @@ end
     end
   end
 
-  desc "Remove capability (pass in capability name with CAPABILITY=<name>)"
-  task :remove, :capability do |_, args|
-    unless args.capability
-      puts red("usage: rake cando:remove[<capability_name>]")
+  desc "Remove role (pass in role name with ROLE=<name>)"
+  task :remove, :role do |_, args|
+    unless args.role
+      puts red("usage: rake cando:remove[<role_name>]")
       exit 1
     end
 
-    unless capabilities.keys.include?(args.capability.to_sym)
-      puts red("capability '#{args.capability}' does not exist")
+    unless roles.keys.include?(args.role.to_sym)
+      puts red("role '#{args.role}' does not exist")
       exit 1
     end
 
-    create_migration "remove_#{args.capability}_capability" do
+    create_migration "remove_#{args.role}_role" do
       <<-EOF
 Sequel.migration do
   up do
-    alter_table :capabilities do
-      drop_column :#{args.capability}
+    alter_table :roles do
+      drop_column :#{args.role}
     end
   end
 
   down do
-    alter_table :capabilities do
-      add_column :#{args.capability}, TrueClass, :null => false, :default => #{capabilities[args.capability.to_sym]}
+    alter_table :roles do
+      add_column :#{args.role}, TrueClass, :null => false, :default => #{roles[args.role.to_sym]}
     end
   end
 end
@@ -120,9 +120,9 @@ EOF
     end
   end
 
-  desc "List capabilities"
+  desc "List roles"
   task :list do
-    capabilities.each do |name, grant_by_default|
+    roles.each do |name, grant_by_default|
       if grant_by_default
         puts "#{name}\t(granted by default)"
       else
