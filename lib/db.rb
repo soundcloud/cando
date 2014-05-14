@@ -1,7 +1,7 @@
 require 'sequel'
 
 module Cando
-  def db
+  def self.connect
     return @db if @db
 
     unless ENV['CANDO_DB']
@@ -28,21 +28,14 @@ execute the following (adjust values as fit):
     CREATE DATABASE IF NOT EXISTS cando  DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
     GRANT ALL ON `cando`.* to 'cando_user'@'localhost' identified by 'cando_passwd';
 
-      EOF
-      exit 1
+EOF
+exit 1
     end
-  end
-
-  def roles
-    db.schema(:roles).inject({}) do |hash, elem|
-      unless elem[1][:primary_key]
-        hash[elem[0]] = elem[1][:ruby_default]
-      end
-      hash
-    end
-  end
-
-  def can(user_urn, *roles)
-    
   end
 end
+
+Cando.connect
+Dir.glob(File.expand_path("#{__FILE__}/../models/*.rb")).each do |model|
+  require_relative model
+end
+

@@ -1,46 +1,73 @@
 require 'tmpdir'
 require_relative '../db'
-include Cando
 
 @cando_db_migration_dir = "db/cando-migrations"
 
 namespace :cando do
-  desc "Initialize cando (creates db and runs migrations)"
+  desc "Initialize cando (creates schema and runs migration)"
   task :init do
-    if Dir.glob("#{@cando_db_migration_dir}/*_create_roles.rb").empty?
-      create_migration :create_roles do
+    if Dir.glob("#{@cando_db_migration_dir}/*_initial_schema.rb").empty?
+      create_migration :create_schema do
         <<-EOF
 Sequel.migration do
   up do
-   create_table :roles do
-     String :user_urn, :unique => true, :null => false
-     primary_key :user_urn
+   create_table :users do
+     String :id, :unique => true, :null => false
+     primary_key :id
     end
+
+   create_table :roles do
+     String :id, :unique => true, :null => false
+     primary_key :id
+   end
+
+   create_table :capabilities do
+     String :id, :unique => true, :null => false
+     primary_key :id
+   end
+
+   # associations
+   create_table :roles_users do
+     String :user_id
+     String :role_id
+     primary_key [:user_id, :role_id], :name => :ur_pk
+   end
+
+   create_table :capabilities_roles do
+     String :role_id
+     String :capability_id
+     primary_key [:role_id, :capability_id], :name =>:rc_pk
+   end
   end
 
   down do
+    drop_table :users
     drop_table :roles
+    drop_table :capabilities
+    drop_table :roles_users
+    drop_table :capabilities_roles
   end
 end
         EOF
       end
     else
-      puts red("skipping first migration file: already exists")
+      $stderr.puts red("skipping first migration file: already exists")
     end
 
     Rake::Task['cando:migrate'].invoke
 
     puts <<EOF
-#{green("Success!")}
+    #{green("Success!")}
 
-In order to add or remove a role, call
+In order to add, update or remove a role, call
 
-    rake cando:add[<role_name>]
-    rake cando:rm[<role_name>]
+    rake cando:add    role=<rolename> capabilities=<cap1>,<cap2>,<cap3>
+    rake cando:update role=<rolename> capabilities=<cap1>,<cap2>,<cap3>
+    rake cando:remove role=<rolename>
 
-respectively. If the default value of a new role should be granted by default, call
+When adding or updating a roles it doesn't matter whether the passed in capabilities
+exist or not -- if not existant, they will be created automatically
 
-    rake cando:add[<role_name>,true]
 
 EOF
 
@@ -52,95 +79,80 @@ EOF
 
     if version = args[:version]
       puts "Migrating to version #{version}"
-      Sequel::Migrator.run(db, @cando_db_migration_dir, { allow_missing_migration_files: true, target: version.to_i } )
+      Sequel::Migrator.run(Cando.connect, @cando_db_migration_dir, { allow_missing_migration_files: true, target: version.to_i } )
     else
       puts "Migrating to latest"
-      Sequel::Migrator.run(db, @cando_db_migration_dir, { allow_missing_migration_files: true} )
+      Sequel::Migrator.run(Cando.connect, @cando_db_migration_dir, { allow_missing_migration_files: true} )
     end
   end
 
-  desc "Add a new role (pass in role name with ROLE=<name>)"
-  task :add, :role, :grant_by_default do |_, args|
-    unless args.role
-      puts red("usage: rake cando:add[<role_name>] / rake cando:add[<role_name>,true] # grant this role by default")
+  desc "Add a new role (pass in role name and capabilities with role=<name> capabilities=<cap1>,<cap2>,... )"
+  task :add do
+    setup_role(false)
+  end
+
+  desc "Update role (pass in role name and capabilities with role=<name> capabilities=<cap1>,<cap2>,... )"
+  task :update do
+    setup_role(true)
+  end
+
+
+  desc "Remove role (pass in role name with role=<name>)"
+  task :remove do
+    unless ENV['role']
+      $stderr.puts red("usage: rake cando:remove role=<rolename>")
       exit 1
     end
 
-    grant_by_default = ( args.grant_by_default == "true" )
-
-    create_migration "add_#{args.role}_role" do
-      <<-EOF
-Sequel.migration do
-  up do
-    alter_table :roles do
-      add_column :#{args.role}, TrueClass, :null => false, :default => #{grant_by_default}
-    end
-  end
-
-  down do
-    alter_table :roles do
-      drop_column :#{args.role}
-    end
-  end
-end
-      EOF
-    end
-  end
-
-  desc "Remove role (pass in role name with ROLE=<name>)"
-  task :remove, :role do |_, args|
-    unless args.role
-      puts red("usage: rake cando:remove[<role_name>]")
+    unless r = Role.find(:id => ENV['role'])
+      $stderr.puts red("role '#{args.role}' does not exist")
       exit 1
     end
 
-    unless roles.keys.include?(args.role.to_sym)
-      puts red("role '#{args.role}' does not exist")
-      exit 1
-    end
-
-    create_migration "remove_#{args.role}_role" do
-      <<-EOF
-Sequel.migration do
-  up do
-    alter_table :roles do
-      drop_column :#{args.role}
-    end
+    r.destroy
   end
 
-  down do
-    alter_table :roles do
-      add_column :#{args.role}, TrueClass, :null => false, :default => #{roles[args.role.to_sym]}
+  desc "Assign role to user (args: roles=<r1>,<r2>,<rn> user=<user_urn>)"
+  task :assign do
+    roles = ENV['roles']
+    user_urn  = ENV['user']
+
+    unless roles && user_urn
+      $stderr.puts red("usage: rake cando:assign user=<user_urn> roles=<role1>,<role2>,... ")
     end
-  end
-end
 
-EOF
 
+    roles.split(",").each do |role_name|
+      role = Role.find(:id => role_name)
+      unless role
+        $stderr.puts red("Role '#{role_name}' does not exist")
+        exit 1
+      end
+
+      begin
+        role.add_user( User.find_or_create(:id => user_urn) )
+      rescue Sequel::UniqueConstraintViolation => e
+        $stderr.puts "user already has role '#{role_name}'"
+      end
     end
   end
 
   desc "List roles"
   task :list do
-    roles.each do |name, grant_by_default|
-      if grant_by_default
-        puts "#{name}\t(granted by default)"
-      else
-        puts "#{name}"
-      end
+    puts "ROLE\tCAPABILITIES"
+    Role.all.each do |role|
+      puts role
     end
   end
-end
 
-def mvtmp(file_name)
-  @@tmp_dir ||= Dir.mktmpdir
-  unless File.exists? file_name
-    puts red("skipping #{file_name}: does not exist")
-    return
+  desc "List users and their roles"
+  task :users do
+    puts "USER_URN\tROLES"
+    User.all.each do |user|
+      puts user
+    end
   end
 
-  puts green("moving #{file_name} to #{@@tmp_dir}")
-  FileUtils.mv file_name, @@tmp_dir
 end
 
 def create_migration(name)
@@ -179,4 +191,22 @@ end
 
 def red(text)
   "\033[1;31;48m#{text}\033[m"
+end
+
+def setup_role(force = false)
+  role         = ENV['role']
+  capabilities = ENV['capabilities'] && ENV['capabilities'].split(",")
+
+  unless role && capabilities
+    puts red("usage: rake cando:add    role=<rolename> capabilities=<cap1>,<cap2>,<cap3>")
+    exit 1
+  end
+
+  if !force && Role.find(:id => role)
+    puts red("Role '#{role}' already exists!")
+    puts "If you want to update '#{role}', please use 'rake cando:update'"
+    exit 1
+  end
+
+  Role.setup_role(role, capabilities)
 end
