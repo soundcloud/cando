@@ -4,7 +4,6 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem "sequel"
-gem "mysql"
 gem "rake"
 
 # Add dependencies to develop your gem here.
