@@ -6,13 +6,15 @@ else
   require_relative './db'
 end
 
-module CanDo
+module CanDoHelper
   def can(user_urn, capability)
-    can_do = User.find_or_create(:id => user_urn).can(capability)
-    if can_do
-      return yield if block_given?
+    user = CanDo::User.find(:id => user_urn)
+    has_permission = user && user.can(capability)
+
+    if block_given? && has_permission
+       return yield
     end
 
-    can_do
+    has_permission
   end
 end
