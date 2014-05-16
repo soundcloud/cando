@@ -1,6 +1,6 @@
 require 'sequel'
 
-module Cando
+module CanDo
   def self.connect
     return @db if @db
 
@@ -34,7 +34,7 @@ exit 1
   end
 end
 
-Cando.connect
+CanDo.connect
 Dir.glob(File.expand_path("#{__FILE__}/../models/*.rb")).each do |model|
   require_relative model
 end
