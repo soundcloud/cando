@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'rake'
-import 'lib/tasks/cando.rake'
 require 'rubygems'
 require 'bundler'
 begin

@@ -17,7 +17,7 @@ namespace :cando do
       $stderr.puts red("skipping copying cando schema migration file: already exists")
     end
 
-    Rake::Task['cando:migrate'].invoke
+    Sequel::Migrator.run(Cando.connect, CANDO_MIGRATION_DIR, { allow_missing_migration_files: true} )
 
     puts <<EOF
     #{green("Success!")}
@@ -37,19 +37,6 @@ For more cando rake tasks execute
 
 EOF
 
-  end
-
-  desc "Migrate cando db"
-  task :migrate, [:version] do |_, args|
-    Sequel.extension :migration
-
-    if version = args[:version]
-      puts "Migrating to version #{version}"
-      Sequel::Migrator.run(Cando.connect, CANDO_MIGRATION_DIR, { allow_missing_migration_files: true, target: version.to_i } )
-    else
-      puts "Migrating to latest"
-      Sequel::Migrator.run(Cando.connect, CANDO_MIGRATION_DIR, { allow_missing_migration_files: true} )
-    end
   end
 
   desc "Add a new role (pass in role name and capabilities with role=<name> capabilities=<cap1>,<cap2>,... )"

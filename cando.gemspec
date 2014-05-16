@@ -5,16 +5,16 @@
 
 Gem::Specification.new do |s|
   s.name = "cando"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel Bornkessel"]
-  s.date = "2014-05-13"
+  s.date = "2014-05-16"
   s.description = "cando description"
   s.email = "daniel@soundcloud.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md"
   ]
   s.files = [
     ".document",
@@ -22,11 +22,16 @@ Gem::Specification.new do |s|
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "Rakefile",
     "VERSION",
     "cando.gemspec",
+    "contrib/initial_schema.rb",
     "lib/cando.rb",
+    "lib/db.rb",
+    "lib/models/capability.rb",
+    "lib/models/role.rb",
+    "lib/models/user.rb",
     "lib/tasks/cando.rake",
     "spec/cando_spec.rb",
     "spec/spec_helper.rb"
@@ -35,14 +40,13 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.23"
-  s.summary = "Simple capabilities and roles helper"
+  s.summary = "Simple roles helper"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<sequel>, [">= 0"])
-      s.add_runtime_dependency(%q<mysql>, [">= 0"])
       s.add_runtime_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
@@ -51,7 +55,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, [">= 0"])
     else
       s.add_dependency(%q<sequel>, [">= 0"])
-      s.add_dependency(%q<mysql>, [">= 0"])
       s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
@@ -61,7 +64,6 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<sequel>, [">= 0"])
-    s.add_dependency(%q<mysql>, [">= 0"])
     s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.8.0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
