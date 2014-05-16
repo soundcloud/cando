@@ -2,14 +2,14 @@ require 'tmpdir'
 require_relative '../db'
 
 CANDO_MIGRATION_DIR = "db/cando-migrations"
-CANDO_SCHEMA = File.expand_path("#{__FILE__}/../../../contrib/initial_schema.rb")
+CANDO_SCHEMA = File.join(File.dirname(File.dirname(File.dirname(__FILE__))), "contrib", "initial_schema.rb")
 
 namespace :cando do
   desc "Initialize cando (creates schema and runs migration)"
   task :init do
     if Dir.glob("#{CANDO_MIGRATION_DIR}/*#{File.basename(CANDO_SCHEMA)}*").empty?
       puts green("Copying cando schema to local cando migrations folder '#{CANDO_MIGRATION_DIR}'")
-      cando_schema_migration = "#{CANDO_MIGRATION_DIR}/#{Time.now.strftime("%Y%m%d%H%M%S")}_#{File.basename(CANDO_SCHEMA)}"
+      cando_schema_migration = File.join(CANDO_MIGRATION_DIR, "#{Time.now.strftime("%Y%m%d%H%M%S")}_#{File.basename(CANDO_SCHEMA)}")
 
       FileUtils.mkdir_p(CANDO_MIGRATION_DIR) unless File.exists?(CANDO_MIGRATION_DIR)
       FileUtils.cp(CANDO_SCHEMA, cando_schema_migration)
