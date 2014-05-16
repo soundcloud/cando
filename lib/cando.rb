@@ -16,4 +16,12 @@ module CanDoHelper
 
     has_permission
   end
+
+  def define_role(role, capabilities)
+    CanDo::Role.define_role(role, capabilities)
+  end
+
+  def assign_roles(user, roles)
+    CanDo::User.find_or_create(:id => user).assign_roles(roles)
+  end
 end

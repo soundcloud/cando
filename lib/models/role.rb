@@ -9,14 +9,12 @@ module CanDo
       self.remove_all_users
     end
 
-    def self.setup_role(role, capabilities)
-      role = Role.find_or_create(:id => role)
+    def self.define_role(name, capabilities)
+      role = Role.find_or_create(:id => name)
       role.remove_all_capabilities
       capabilities.each do |capability|
         role.add_capability( Capability.find_or_create(:id => capability) )
       end
-
-      role
     end
 
     def to_s

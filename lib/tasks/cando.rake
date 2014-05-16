@@ -54,12 +54,12 @@ EOF
 
   desc "Add a new role (pass in role name and capabilities with role=<name> capabilities=<cap1>,<cap2>,... )"
   task :add do
-    setup_role(false)
+    add_role(false)
   end
 
   desc "Update role (pass in role name and capabilities with role=<name> capabilities=<cap1>,<cap2>,... )"
   task :update do
-    setup_role(true)
+    add_role(true)
   end
 
 
@@ -87,20 +87,8 @@ EOF
       $stderr.puts red("usage: rake cando:assign user=<user_urn> roles=<role1>,<role2>,... ")
     end
 
-
-    roles.split(",").each do |role_name|
-      role = CanDo::Role.find(:id => role_name)
-      unless role
-        $stderr.puts red("Role '#{role_name}' does not exist")
-        exit 1
-      end
-
-      begin
-        role.add_user( CanDo::User.find_or_create(:id => user_urn) )
-      rescue Sequel::UniqueConstraintViolation => e
-        $stderr.puts "user already has role '#{role_name}'"
-      end
-    end
+    include CanDoHelper
+    assign_roles(user_urn, roles.split(","))
   end
 
   desc "List roles"
@@ -129,7 +117,7 @@ def red(text)
   "\033[1;31;48m#{text}\033[m"
 end
 
-def setup_role(force = false)
+def add_role(force = false)
   role         = ENV['role']
   capabilities = ENV['capabilities'] && ENV['capabilities'].split(",")
 
@@ -144,5 +132,6 @@ def setup_role(force = false)
     exit 1
   end
 
-  CanDo::Role.setup_role(role, capabilities)
+  include CanDoHelper
+  define_role(role, capabilities)
 end
