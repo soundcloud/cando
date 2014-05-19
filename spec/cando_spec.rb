@@ -107,7 +107,7 @@ describe CanDo do
       context "CanDo#can" do
         it { can("user", :capability1).should be_true }
         it { can("user", :undefined_capability).should be_false }
-        #it { expect{ can("user", :capability1, &code) }.to yield_control }
+        it { expect{ |b| can("user", :capability1, &b) }.to yield_control }
       end
     end
   end
