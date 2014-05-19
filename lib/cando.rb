@@ -7,20 +7,30 @@ end
 
 module CanDo
   class ConfigCannotBlockError < RuntimeError; end
+  class ConfigMysqlDBError < RuntimeError; end
   class ConfigMysqlConnectionError < RuntimeError; end
   class DBNotConnected < RuntimeError; end
 
-  def db
+  def self.db
     @db or raise DBNotConnected.new("CanDo is not connected to a database")
   end
 
   def self.init(&block)
     CanDo.instance_eval &block
 
+    begin
+      Sequel::Model.db.test_connection
+    rescue ::Sequel::Error => e
+      raise DBNotConnected.new("No database connection established. Have you called 'connect' within the 'CanDo.init' block? Sequel error message is:\n#{e.message}")
+    end
+
     Dir.glob(File.expand_path("#{__FILE__}/../models/*.rb")).each do |model|
       require_relative model
     end
+
+    Sequel::Model.db
   end
+
 
   # will be executed if `can(user_urn, :capability) { }` will not be executed
   # due to missing capabilities
@@ -40,6 +50,10 @@ module CanDo
 
 
   def self.connect(connection)
+    if connection =~ /sqlite/
+      raise ConfigMysqlDBError.new("sqlite is not supported as it misses certain constraints")
+    end
+
     begin
       @db = Sequel.connect(connection)
       @db.test_connection

@@ -7,14 +7,17 @@ module CanDo
     def before_destroy
       self.remove_all_capabilities
       self.remove_all_users
+      Capability.cleanup
     end
 
     def self.define_role(name, capabilities)
       role = Role.find_or_create(:id => name)
       role.remove_all_capabilities
       capabilities.each do |capability|
-        role.add_capability( Capability.find_or_create(:id => capability) )
+        role.add_capability( Capability.find_or_create(:id => capability.to_s) )
       end
+
+      role
     end
 
     def to_s
