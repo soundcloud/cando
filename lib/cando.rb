@@ -42,12 +42,8 @@ module CanDo
       raise ConfigCannotBlockError.new("CanDo#cannot_block expects block expecting two arguments |user_urn, capability|")
     end
 
-    @cannot_block_proc = block
+    @@cannot_block_proc = block
   end
-  def cannot_block_proc
-    @cannot_block_proc
-  end
-
 
   def self.connect(connection)
     if connection =~ /sqlite/
@@ -70,13 +66,12 @@ EOF
   def can(user_urn, capability)
     user = CanDo::User.find(:id => user_urn)
     has_permission = user && user.can(capability)
-
     if block_given?
       if has_permission
        return yield
       end
-      if CanDo.cannot_block_proc
-        CanDo.cannot_block_proc.call(user_urn, capability)
+      if @@cannot_block_proc
+        @@cannot_block_proc.call(user_urn, capability)
       end
     end
 

@@ -97,7 +97,6 @@ describe CanDo do
 
     context "CanDo#can" do
       include CanDo
-      let(:code) { lambda{} }
 
       before(:each) do
         @role = define_role("role", [:capability1, :capabilty2])
@@ -107,7 +106,20 @@ describe CanDo do
       context "CanDo#can" do
         it { can("user", :capability1).should be_true }
         it { can("user", :undefined_capability).should be_false }
-        it { expect{ |b| can("user", :capability1, &b) }.to yield_control }
+
+        it { expect{ |can| can("user", :capability1, &can) }.to yield_control }
+
+        context "CanDo.cannot_block" do
+          class DummyException < RuntimeError; end
+          before(:all) do
+            CanDo.cannot_block do |user, capabilty|
+              raise DummyException
+            end
+          end
+
+          it { expect{ can("user", :undefined_capability){} }.to raise_error(DummyException) }
+          it { expect{ can("user", :undefined_capability)}.to_not raise_error(DummyException) }
+        end
       end
     end
   end
