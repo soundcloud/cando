@@ -94,5 +94,21 @@ describe CanDo do
         it { expect{ @user.destroy }.to change{CanDo::Role.count}.by(0) }
       end
     end
+
+    context "CanDo#can" do
+      include CanDo
+      let(:code) { lambda{} }
+
+      before(:each) do
+        @role = define_role("role", [:capability1, :capabilty2])
+        @user = assign_roles("user", [@role])
+      end
+
+      context "CanDo#can" do
+        it { can("user", :capability1).should be_true }
+        it { can("user", :undefined_capability).should be_false }
+        #it { expect{ can("user", :capability1, &code) }.to yield_control }
+      end
+    end
   end
 end

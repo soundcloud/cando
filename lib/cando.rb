@@ -80,6 +80,7 @@ EOF
       end
     end
 
+    has_permission
   end
 
   def define_role(role, capabilities)
