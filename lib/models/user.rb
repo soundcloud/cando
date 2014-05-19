@@ -27,8 +27,12 @@ module CanDo
       end
     end
 
+    def role_names
+      roles.map(&:id)
+    end
+
     def to_s
-      "#{id}\t#{roles.map(&:id).join(",")}"
+      "#{id}\t#{role_names.join(",")}\t#{capabilities.join(",")}"
     end
   end
 end

@@ -1,5 +1,4 @@
 require 'tmpdir'
-require_relative '../db'
 
 CANDO_MIGRATION_DIR = "db/cando-migrations"
 CANDO_SCHEMA = File.join(File.dirname(File.dirname(File.dirname(__FILE__))), "contrib", "initial_schema.rb")
@@ -17,7 +16,7 @@ namespace :cando do
       $stderr.puts red("skipping copying cando schema migration file: already exists")
     end
 
-    Sequel::Migrator.run(Cando.connect, CANDO_MIGRATION_DIR, { allow_missing_migration_files: true} )
+    Sequel::Migrator.run(connect_to_db, CANDO_MIGRATION_DIR, { allow_missing_migration_files: true} )
 
     puts <<EOF
     #{green("Success!")}
@@ -57,6 +56,7 @@ EOF
       exit 1
     end
 
+    connect_to_db
     unless r = CanDo::Role.find(:id => ENV['role'])
       $stderr.puts red("role '#{args.role}' does not exist")
       exit 1
@@ -74,12 +74,14 @@ EOF
       $stderr.puts red("usage: rake cando:assign user=<user_urn> roles=<role1>,<role2>,... ")
     end
 
-    include CanDoHelper
+    connect_to_db
+    include CanDo
     assign_roles(user_urn, roles.split(","))
   end
 
   desc "List roles"
   task :list do
+    connect_to_db
     puts "ROLE\tCAPABILITIES"
     CanDo::Role.all.each do |role|
       puts role
@@ -88,7 +90,8 @@ EOF
 
   desc "List users and their roles"
   task :users do
-    puts "USER_URN\tROLES"
+    connect_to_db
+    puts "USER_URN\tROLES\tCAPABILITIES"
     CanDo::User.all.each do |user|
       puts user
     end
@@ -113,12 +116,23 @@ def add_role(force = false)
     exit 1
   end
 
+  connect_to_db
   if !force && CanDo::Role.find(:id => role)
     puts red("Role '#{role}' already exists!")
     puts "If you want to update '#{role}', please use 'rake cando:update'"
     exit 1
   end
 
-  include CanDoHelper
+  include CanDo
   define_role(role, capabilities)
+end
+
+def connect_to_db
+  unless ENV['CANDO_DB']
+    raise "Please pass in database config, e.g. CANDO_DB=mysql://user:passwd@host/database bundle exec rake cando:<command>"
+  end
+
+  CanDo.init do
+    connect(ENV['CANDO_DB'])
+  end
 end

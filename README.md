@@ -24,8 +24,6 @@ Download and install rake with the following.
 
         gem install cando
 
-
-
 ## Configuration and usage
 
 ### Database setup & configuration
@@ -34,7 +32,7 @@ If you want to use an individual database for cando, create the db + credentials
     CREATE DATABASE IF NOT EXISTS cando  DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
     GRANT ALL ON `cando`.* to 'cando_user'@'localhost' identified by 'cando_passwd';
 
-Whenever you want to use CanDo, you need to set the database config via the env var `$CANDO_DB`:
+Whenever you want to use a CanDo rake task, you need to set the database config via the env var `$CANDO_DB`:
 
      export CANDO_DB=mysql://cando_user@cando_passwd@localhost/cando
 
@@ -73,7 +71,17 @@ to use those edit (or create) the `Rakefile` and include
 Using the CanDo in your code (working code with an empty database):
 
     require 'cando'
-    include CanDoHelper
+    include CanDo
+
+    CanDo.init do
+      # if passed, this will be executed if the user does not have the
+      # asked-for capability (only applies if 'can' is passed a block)
+      cannot_block do |user_urn, capability|
+        raise "#{user_urn} can not #{capability}"
+      end
+
+      connect "mysql://cando_user:cando_passwd@host:port/database"
+    end
 
     # if the role or a capability does not exist, it'll be created
     define_role("r1", ["capability1", "capability3"])
@@ -86,6 +94,11 @@ Using the CanDo in your code (working code with an empty database):
     # use 'can' block syntax
     can("user1", :capability1) do
       puts "user has capability1"
+    end
+
+    # this will raise an exception as declared in the init block
+    can("user1", :super_admin) do
+      puts "hey hoh" # this will not be printed
     end
 
     # when no block is given, 'can' returns true or false/nil
