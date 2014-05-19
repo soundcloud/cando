@@ -1,4 +1,4 @@
-require 'Sequel' 
+require 'sequel' 
 
 if File.basename($0) == "rake"    # we are in a rake call: export our rake stuff
   require 'rake'
