@@ -6,7 +6,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 #  end
 #end
 #
-describe CanDo do
+describe "CanDo module methods" do
   context "CanDo.cannot_block expects block accepting two parameters" do
     it { expect{ CanDo.cannot_block }.to              raise_error(CanDo::ConfigCannotBlockError) }
     it { expect{ CanDo.cannot_block{|x| x} }.to       raise_error(CanDo::ConfigCannotBlockError) }
@@ -27,7 +27,7 @@ describe CanDo do
     end
   end
 
-  context CanDo do
+  context "CanDo exported methods" do
     include CanDo
 
     context "CanDo#define_role" do
