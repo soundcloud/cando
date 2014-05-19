@@ -1,0 +1,8 @@
+language: ruby
+rvm:
+  - "1.9.3"
+cache: bundler
+before_script:
+    - mysql -e 'create database cando_test;'
+
+env: CANDO_TEST_DB=mysql://travis@127.0.0.1/cando_test
