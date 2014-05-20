@@ -71,7 +71,7 @@ EOF
        return yield
       end
       if @@cannot_block_proc
-        @@cannot_block_proc.call(user_urn, capability)
+        self.instance_exec user_urn, capability, &@@cannot_block_proc
       end
     end
 
