@@ -1,4 +1,5 @@
 require 'tmpdir'
+require 'sequel'
 
 CANDO_MIGRATION_DIR = "db/cando-migrations"
 CANDO_SCHEMA = File.join(File.dirname(File.dirname(File.dirname(__FILE__))), "contrib", "initial_schema.rb")
@@ -16,6 +17,7 @@ namespace :cando do
       $stderr.puts red("skipping copying cando schema migration file: already exists")
     end
 
+    Sequel.extension :migration
     Sequel::Migrator.run(connect_to_db, CANDO_MIGRATION_DIR, { allow_missing_migration_files: true} )
 
     puts <<EOF
