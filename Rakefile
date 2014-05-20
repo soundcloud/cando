@@ -19,7 +19,12 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/kesselborn/cando"
   gem.license = "MIT"
   gem.summary = %Q{Simple roles helper}
-  gem.description = %Q{cando description}
+  gem.description = %Q{CanDo is a small gem to implement a simple user access system based on users, roles & capabilites, where:
+
+    each user can have 0, 1 or many roles
+    each role can have 0, 1 or many capabilites
+
+Users have capabilities by getting roles assigned (role == collection of capabilities). Within the code, the can helper method can be used to test whether a user has a certain capability or not (see below for a working code example).}
   gem.email = "daniel@soundcloud.com"
   gem.authors = ["Daniel Bornkessel"]
   # dependencies defined in Gemfile
