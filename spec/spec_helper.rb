@@ -34,7 +34,9 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     db = CanDo.init do
-      connect ENV['CANDO_TEST_DB']
+      db = connect ENV['CANDO_TEST_DB']
+      db.drop_table(*db.tables)
+      migration.apply(db, :up)
     end
   end
 
