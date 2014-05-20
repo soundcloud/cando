@@ -34,7 +34,7 @@ If you want to use an individual database for cando, create the db + credentials
 
 Whenever you want to use a CanDo rake task, you need to set the database config via the env var `$CANDO_DB`:
 
-     export CANDO_DB=mysql://cando_user@cando_passwd@localhost/cando
+     export CANDO_TEST_DB=mysql://cando_user:cando_passwd@localhost/cando
 
 for other dbs, [see the sequel
 documentation](http://sequel.jeremyevans.net/rdoc/classes/Sequel.html#method-c-connect).
