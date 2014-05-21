@@ -73,7 +73,7 @@ describe "CanDo module methods" do
 
       context "cleanup" do
         before(:each) do
-          @role = define_role("role", [:capabilty])
+          @role = define_role("role", [:capability])
         end
 
         it { expect{ @role.destroy }.to change{CanDo::Role.count}.from(1).to(0) }
@@ -109,7 +109,7 @@ describe "CanDo module methods" do
 
       context "cleanup" do
         before(:each) do
-          @role = define_role("role", [:capabilty])
+          @role = define_role("role", [:capability])
           @user = assign_roles("user", [@role])
         end
 
@@ -122,7 +122,7 @@ describe "CanDo module methods" do
       include CanDo
 
       before(:each) do
-        @role = define_role("role", [:capability1, :capabilty2])
+        @role = define_role("role", [:capability1, :capability2])
         @user = assign_roles("user", [@role])
       end
 
@@ -135,7 +135,7 @@ describe "CanDo module methods" do
         context "CanDo.cannot_block" do
           class DummyException < RuntimeError; end
           before(:all) do
-            CanDo.cannot_block do |user, capabilty|
+            CanDo.cannot_block do |user, capability|
               raise DummyException
             end
           end
@@ -144,6 +144,30 @@ describe "CanDo module methods" do
           it { expect{ can("user", :undefined_capability)}.to_not raise_error(DummyException) }
         end
       end
+    end
+
+    context "CanDo#roles" do
+      include CanDo
+      before(:each) do
+        @role1 = define_role("role1", [:capability1, :capability2])
+        @role2 = define_role("role2", [:capability3, :capability4])
+        @user = assign_roles("user", [@role1,@role2])
+      end
+
+      it { roles("user").sort.should == ["role1","role2"] }
+      it { roles("non-existant-user").sort.should == [] }
+    end
+
+    context "CanDo#capabilities" do
+      include CanDo
+      before(:each) do
+        @role1 = define_role("role1", [:capability1, :capability2])
+        @role2 = define_role("role2", [:capability2, :capability4])
+        @user = assign_roles("user", [@role1,@role2])
+      end
+
+      it { capabilities("user").sort.should == [:capability1, :capability2,:capability4].sort }
+      it { capabilities("non-existant-user").sort.should == [] }
     end
   end
 end

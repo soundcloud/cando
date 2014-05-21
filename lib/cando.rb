@@ -85,4 +85,18 @@ EOF
   def assign_roles(user, roles)
     CanDo::User.find_or_create(:id => user).assign_roles(roles)
   end
+
+  def roles(user)
+    user = CanDo::User.first(:id => user)
+    return [] unless user
+
+    user.roles.map(&:id)
+  end
+
+  def capabilities(user)
+    user = CanDo::User.first(:id => user)
+    return [] unless user
+
+    user.capabilities.map{|x| x.to_sym }
+  end
 end

@@ -77,7 +77,7 @@ Using the CanDo in your code (working code with an empty database):
       # if passed, this will be executed if the user does not have the
       # asked-for capability (only applies if 'can' is passed a block)
       cannot_block do |user_urn, capability|
-        raise "#{user_urn} can not #{capability}"
+        raise "#{user_urn} can not #{capability} .. user capabilities are: #{capabilities(user_urn)}"
       end
 
       connect "mysql://cando_user:cando_passwd@host:port/database"
@@ -86,9 +86,13 @@ Using the CanDo in your code (working code with an empty database):
     # if the role or a capability does not exist, it'll be created
     define_role("r1", ["capability1", "capability3"])
     define_role("r2", ["capability2"])
+    define_role("r3", ["capability3"])
 
     # if the user does not exist, he'll be created -- the roles must be available
-    assign_roles("user1", ["r1", "r2"])
+    assign_roles("user1", ["r1"])
+    # add other roles by unifying arrays with '|'
+    assign_roles("user1", roles("user1") | ["r2","r3"])
+
     assign_roles("user2", ["r1"])
 
     # use 'can' block syntax
