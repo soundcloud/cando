@@ -15,6 +15,29 @@ describe "CanDo module methods" do
     it { expect{ CanDo.cannot_block{|x,y| x} }.to_not raise_error(CanDo::ConfigCannotBlockError) }
   end
 
+  context "CanDo.cannot_block executes in the current context" do
+
+    it "sees local methods" do
+      CanDo.cannot_block{|x,y| local_dummy_method }
+
+      class Dummy
+        include CanDo
+        class DummyException < Exception; end
+
+        def local_dummy_method
+          raise DummyException
+        end
+
+        def foo
+          can("erna",:superpowers) {}
+        end
+      end
+
+      foo = Dummy.new
+      expect{ foo.foo }.to raise_error Dummy::DummyException
+    end
+  end
+
   context "CanDo.connect" do
     it { expect{ CanDo.connect(nil) }.to raise_error(CanDo::ConfigMysqlConnectionError) }
     it { expect{ CanDo.connect("sqlite::memory:") }.to raise_error(CanDo::ConfigMysqlDBError) }
