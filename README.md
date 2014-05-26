@@ -1,4 +1,4 @@
-# CanDo [![Build Status](https://travis-ci.org/soundcloud/cando.svg?branch=master)](https://travis-ci.org/soundcloud/cando)
+w# CanDo [![Build Status](https://travis-ci.org/soundcloud/cando.svg?branch=master)](https://travis-ci.org/soundcloud/cando)
 
 CanDo is a small gem to implement a simple user access system based on users, roles &
 capabilites, where:
@@ -68,6 +68,52 @@ to use those edit (or create) the `Rakefile` and include
      rake cando:users    # List users and their roles
 
 ### Using CanDo in your project's code
+
+#### Api
+ connect to db (usually called within init block):
+
+    CanDo.connect "mysql://user:passwd@host:port/database"
+
+ create a role; capabilities will be created if they don't exist yet:
+
+    define_role("role_name", ["capability1","capability2", "capability3", ...])
+
+ assign role(s) to a user: if no user with that id exist, a new one will
+ be created; if a role does not exist, an exception is raised. You can pass
+ in a role object or just role names; pass in empty array to remove all roles:
+
+    role3 = CanDo::Role.first
+    assign_roles("user1", ["role1", "role2", role3])
+
+ get user's capabilities; returns an array of strings:
+
+    capabilities("user1")
+
+ get user's roles; returns an array of strings:
+
+    roles("user1")
+
+ set default handler if `can("u","c"){ ... }` fails (usually called within init block):
+
+    CanDo.cannot_block { |user_urn, capability| raise "#{user_urn} is missing #{capability}" }
+
+ guard block by `can` function; will execute `cannot_block` if user is missing
+ this capability (see example below):
+
+    can("user1", :capability1) do
+      puts "woohoo"
+    end
+
+ use `can` function as an expression -- `cannot_block` will not be executed if
+ expressions resolves to `false`:
+
+    if can("user1", :capability1)
+       puts "woohoo"
+    else
+       puts ":("
+    end
+
+#### Usage example
 Using the CanDo in your code (working code with an empty database):
 
     require 'cando'
