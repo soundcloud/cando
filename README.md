@@ -70,6 +70,8 @@ to use those edit (or create) the `Rakefile` and include
 ### Using CanDo in your project's code
 
 #### Api
+Please see [the api documentation](http://rubydoc.info/gems/cando/CanDo) up to date documentation.
+
  connect to db (usually called within init block):
 
     CanDo.connect "mysql://user:passwd@host:port/database"

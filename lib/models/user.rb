@@ -1,6 +1,6 @@
 module CanDo
-  class UndefinedRole < Exception; end
   class User < Sequel::Model(:cando_users)
+
     many_to_many :roles, :join_table => :cando_roles_users
     unrestrict_primary_key
 
@@ -22,7 +22,7 @@ module CanDo
           rescue Sequel::UniqueConstraintViolation => e
             puts "user already has role '#{r}'"
           rescue Sequel::NoMatchingRow
-            raise UndefinedRole.new("Role '#{r}' does not exist")
+            raise Role::UndefinedRole.new("Role '#{r}' does not exist")
           end
         end
       end

@@ -1,11 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-#describe "Cando" do
-#  it "fails" do
-#    fail "hey buddy, you should probably rename this file and start specing for real"
-#  end
-#end
-#
 describe "CanDo module methods" do
   context "CanDo.cannot_block expects block accepting two parameters" do
     it { expect{ CanDo.cannot_block }.to              raise_error(CanDo::ConfigCannotBlockError) }
@@ -39,8 +33,8 @@ describe "CanDo module methods" do
   end
 
   context "CanDo.connect" do
-    it { expect{ CanDo.connect(nil) }.to raise_error(CanDo::ConfigMysqlConnectionError) }
-    it { expect{ CanDo.connect("sqlite::memory:") }.to raise_error(CanDo::ConfigMysqlDBError) }
+    it { expect{ CanDo.connect(nil) }.to raise_error(CanDo::ConfigConnectionError) }
+    it { expect{ CanDo.connect("sqlite::memory:") }.to raise_error(CanDo::ConfigDBError) }
     it { CanDo.connect(ENV['CANDO_TEST_DB']).test_connection be_true }
   end
 
@@ -90,8 +84,8 @@ describe "CanDo module methods" do
       end
 
       context "invalid roles" do
-        it { expect{ assign_roles("user", ["non-existant-role"]) }.to raise_error(CanDo::UndefinedRole) }
-        it { expect{ assign_roles("user", [nil]) }.to raise_error(CanDo::UndefinedRole) }
+        it { expect{ assign_roles("user", ["non-existant-role"]) }.to raise_error(CanDo::Role::UndefinedRole) }
+        it { expect{ assign_roles("user", [nil]) }.to raise_error(CanDo::Role::UndefinedRole) }
       end
 
       context "standard situation" do

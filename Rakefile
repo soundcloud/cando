@@ -51,6 +51,7 @@ Rake::RDocTask.new do |rdoc|
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "cando #{version}"
+  rdoc.rdoc_files.include('lib')
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
   rdoc.rdoc_files.include('contrib/**/*.rb')

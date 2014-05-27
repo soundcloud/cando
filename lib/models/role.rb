@@ -1,5 +1,8 @@
 module CanDo
   class Role < Sequel::Model(:cando_roles)
+    # This role does not exist
+    class UndefinedRole < Exception; end
+
     many_to_many :users, :join_table => :cando_roles_users
     many_to_many :capabilities, :join_table => :cando_capabilities_roles
     unrestrict_primary_key
