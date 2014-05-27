@@ -1,4 +1,4 @@
-w# CanDo [![Build Status](https://travis-ci.org/soundcloud/cando.svg?branch=master)](https://travis-ci.org/soundcloud/cando)
+# CanDo [![Build Status](https://travis-ci.org/soundcloud/cando.svg?branch=master)](https://travis-ci.org/soundcloud/cando)
 
 CanDo is a small gem to implement a simple user access system based on users, roles &
 capabilites, where:
