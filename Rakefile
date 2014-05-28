@@ -16,7 +16,7 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
   gem.name = "cando"
-  gem.homepage = "http://github.com/kesselborn/cando"
+  gem.homepage = "http://github.com/soundcloud/cando"
   gem.license = "MIT"
   gem.summary = %Q{Simple roles helper}
   gem.description = %Q{CanDo is a small gem to implement a simple user access system based on users, roles & capabilites, where:
