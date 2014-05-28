@@ -6,6 +6,8 @@ if File.basename($0) == "rake"    # we are in a rake call: export our rake stuff
 end
 
 module CanDo
+  @@cannot_block_proc = nil
+
   # The provided cannot_block is not as expected
   class ConfigCannotBlockError < RuntimeError; end
 
