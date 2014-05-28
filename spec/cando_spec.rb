@@ -6,7 +6,7 @@ describe "CanDo module methods" do
     it { expect{ CanDo.cannot_block{|x| x} }.to       raise_error(CanDo::ConfigCannotBlockError) }
     it { expect{ CanDo.cannot_block{|x,y,z| x} }.to   raise_error(CanDo::ConfigCannotBlockError) }
 
-    it { expect{ CanDo.cannot_block{|x,y| x} }.to_not raise_error(CanDo::ConfigCannotBlockError) }
+    it { expect{ CanDo.cannot_block{|x,y| x} }.to_not raise_error }
   end
 
   context "CanDo.cannot_block executes in the current context" do
@@ -135,7 +135,7 @@ describe "CanDo module methods" do
           end
 
           it { expect{ can("user", :undefined_capability){} }.to raise_error(DummyException) }
-          it { expect{ can("user", :undefined_capability)}.to_not raise_error(DummyException) }
+          it { expect{ can("user", :undefined_capability)}.to_not raise_error }
         end
       end
     end
