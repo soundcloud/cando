@@ -25,7 +25,7 @@ require 'cando'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
-ENV['CANDO_TEST_DB'] or raise "Please set CANDO_TEST_DB to a valid configuration similar to 'mysql://user:passwd@localhost/database'"
+ENV['CANDO_TEST_DB'] ||= 'mysql://cando_user:cando_passwd@localhost/cando'
 
 RSpec.configure do |config|
   Sequel.extension :migration
