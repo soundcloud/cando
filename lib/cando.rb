@@ -1,4 +1,4 @@
-require 'sequel' 
+require 'sequel'
 
 if File.basename($0) == "rake"    # we are in a rake call: export our rake stuff
   require 'rake'
@@ -94,7 +94,7 @@ module CanDo
       @db
     rescue => e
       raise ConfigConnectionError.new(<<-EOF
-Error connecting to database. Be sure to pass in a databse config like 'mysql://user:passwd@host/database':
+Error connecting to database. Be sure to pass in a database config like 'mysql://user:passwd@host/database':
 #{e.message}
 EOF
       )
