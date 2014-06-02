@@ -25,7 +25,8 @@ require 'cando'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
-ENV['CANDO_TEST_DB'] ||= 'mysql://cando_user:cando_passwd@localhost/cando'
+db_connection_string = ENV['CANDO_TEST_DB'] || 'mysql://cando_user:cando_passwd@localhost/cando'
+
 
 RSpec.configure do |config|
   Sequel.extension :migration
@@ -34,9 +35,17 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     db = CanDo.init do
-      db = connect ENV['CANDO_TEST_DB']
-      db.drop_table(*db.tables)
-      migration.apply(db, :up)
+      begin
+        db = connect db_connection_string
+        db.drop_table(*db.tables)
+        migration.apply(db, :up)
+      rescue => e
+        message = e.message
+        unless ENV['CANDO_TEST_DB']
+          message = "\n\nUsed db config was: '#{db_connection_string}'; overwrite by setting the env var $CANDO_TEST_DB\n" + message
+        end
+        raise message
+      end
     end
   end
 
