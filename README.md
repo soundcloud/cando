@@ -14,15 +14,61 @@ Users have capabilities by getting roles assigned (role == collection of
 capabilities). Within the code, the `can` helper method can be used to test
 whether a user has a certain capability or not (see below for a working code example).
 
-## Dependencies
+  - [Usage example](#usage-example)
+  - [Installation](#installation)
+  - [Configuration and usage](#configuration-and-usage)
+    - [Database setup & configuration](#database-setup--configuration)
+    - [Init CanDo](#init-cando)
+    - [Using CanDo rake tasks](#using-rake-tasks)
+  - [Using CanDo in your project's code](#using-cando-in-your-projects-code)
+    - [Api](#api)
+  - [Versioning](#versioning)
+  - [Licensing](#licensing)
 
-CanDo depends on the following software:
+#### Usage example
+Using the CanDo in your code (working code with an empty database):
 
-* [sequel](http://sequel.jeremyevans.net)
-* [rake](https://github.com/jimweirich/rake)
+    require 'cando'
+    include CanDo
 
+    CanDo.init do
+      # if passed, this will be executed if the user does not have the
+      # asked-for capability (only applies if 'can' is passed a block)
+      cannot_block do |user_urn, capability|
+        raise "#{user_urn} can not #{capability} .. user capabilities are: #{capabilities(user_urn)}"
+      end
 
-## Installation and deployment
+      connect "mysql://cando_user:cando_passwd@host:port/database"
+    end
+
+    # if the role or a capability does not exist, it'll be created
+    define_role("r1", ["capability1", "capability3"])
+    define_role("r2", ["capability2"])
+    define_role("r3", ["capability3"])
+
+    # if the user does not exist, he'll be created -- the roles must be available
+    assign_roles("user1", ["r1"])
+    # add other roles by unifying arrays with '|'
+    assign_roles("user1", roles("user1") | ["r2","r3"])
+
+    assign_roles("user2", ["r1"])
+
+    # use 'can' block syntax
+    can("user1", :capability1) do
+      puts "user has capability1"
+    end
+
+    # this will raise an exception as declared in the init block
+    can("user1", :super_admin) do
+      puts "hey hoh" # this will not be printed
+    end
+
+    # when no block is given, 'can' returns true or false/nil
+    unless can("user2", :capability2)
+      puts "user does not have capability1"
+    end
+
+## Installation
 
 Download and install rake with the following.
 
@@ -74,7 +120,7 @@ to use those edit (or create) the `Rakefile` and include
 ### Using CanDo in your project's code
 
 #### Api
-Please see [the api documentation](http://rubydoc.info/gems/cando/CanDo) up to date documentation.
+Please see [the api documentation](http://rubydoc.info/gems/cando/CanDo) for up to date documentation.
 
  connect to db (usually called within init block):
 
@@ -119,48 +165,6 @@ Please see [the api documentation](http://rubydoc.info/gems/cando/CanDo) up to d
        puts ":("
     end
 
-#### Usage example
-Using the CanDo in your code (working code with an empty database):
-
-    require 'cando'
-    include CanDo
-
-    CanDo.init do
-      # if passed, this will be executed if the user does not have the
-      # asked-for capability (only applies if 'can' is passed a block)
-      cannot_block do |user_urn, capability|
-        raise "#{user_urn} can not #{capability} .. user capabilities are: #{capabilities(user_urn)}"
-      end
-
-      connect "mysql://cando_user:cando_passwd@host:port/database"
-    end
-
-    # if the role or a capability does not exist, it'll be created
-    define_role("r1", ["capability1", "capability3"])
-    define_role("r2", ["capability2"])
-    define_role("r3", ["capability3"])
-
-    # if the user does not exist, he'll be created -- the roles must be available
-    assign_roles("user1", ["r1"])
-    # add other roles by unifying arrays with '|'
-    assign_roles("user1", roles("user1") | ["r2","r3"])
-
-    assign_roles("user2", ["r1"])
-
-    # use 'can' block syntax
-    can("user1", :capability1) do
-      puts "user has capability1"
-    end
-
-    # this will raise an exception as declared in the init block
-    can("user1", :super_admin) do
-      puts "hey hoh" # this will not be printed
-    end
-
-    # when no block is given, 'can' returns true or false/nil
-    unless can("user2", :capability2)
-      puts "user does not have capability1"
-    end
 
 ## Versioning
 CanDo adheres to Semantic Versioning 2.0.0. If there is a violation of
