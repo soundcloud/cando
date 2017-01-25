@@ -1,18 +1,15 @@
 Sequel.migration do
   up do
    create_table :cando_users do
-     String :id, :unique => true, :null => false
-     primary_key :id
+     String :id, :unique => true, :null => false, :primary_key => true
     end
 
    create_table :cando_roles do
-     String :id, :unique => true, :null => false
-     primary_key :id
+     String :id, :unique => true, :null => false, :primary_key => true
    end
 
    create_table :cando_capabilities do
-     String :id, :unique => true, :null => false
-     primary_key :id
+     String :id, :unique => true, :null => false, :primary_key => true
    end
 
    # associations
