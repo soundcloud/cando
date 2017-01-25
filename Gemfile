@@ -1,21 +1,16 @@
-source "http://rubygems.org"
-# Add dependencies required to use your gem here.
-# Example:
-#   gem "activesupport", ">= 2.3.5"
+source 'http://rubygems.org'
 
-gem "sequel", "~> 4.10.0"
-gem "rake", "~> 10.3.2"
+gem 'sequel', '~> 4.42'
+gem 'rake', '~> 10.0', '< 11.0' # TODO: Upgrade to Rake 12.0+ (requires upgrading to RSpec 3.x)
 
-# Add dependencies to develop your gem here.
-# Include everything needed to run rake, tests, features, etc.
 group :development do
-  gem "rspec", "~> 2.14.1"
-  gem "rdoc", "~> 4.1.1"
-  gem "bundler", "~> 1.0"
-  gem "jeweler", "~> 2.0.1"
-  gem "simplecov", "~> 0.8.1"
+  gem 'rspec', '~> 2.14' # TODO: Upgrade to RSpec 3.x
+  gem 'rdoc', '~> 5.0'
+  gem 'bundler', '~> 1.13'
+  gem 'jeweler', '~> 2.3'
+  gem 'simplecov', '~> 0.12'
 end
 
 group :test do
-  gem "mysql"
+  gem 'mysql', '~> 2.9'
 end
