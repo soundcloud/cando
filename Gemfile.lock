@@ -45,7 +45,7 @@ GEM
       rack (>= 1.2, < 3)
     public_suffix (4.0.3)
     rack (2.2.2)
-    rake (10.3.2)
+    rake (12.3.3)
     rdoc (4.1.1)
       json (~> 1.4)
     rspec (2.14.1)
@@ -71,7 +71,7 @@ DEPENDENCIES
   bundler (~> 1.0)
   jeweler (~> 2.0.1)
   mysql
-  rake (~> 10.3.2)
+  rake (~> 12.3.3)
   rdoc (~> 4.1.1)
   rspec (~> 2.14.1)
   sequel (~> 4.10.0)
