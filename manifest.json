@@ -2,7 +2,7 @@
     "name": "cando",
     "description": "Gem for adding roles-based capability management. Used by Sonar.",
     "contact_email": "internal-tools@soundcloud.com",
-    "owner": "internal-tools",
+    "owner": "unknown",
     "status": "production",
     "data_sensitivity": ["no_user_data"],
     "dependencies": []
