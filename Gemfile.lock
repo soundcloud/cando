@@ -29,7 +29,6 @@ GEM
       nokogiri (>= 1.5.10)
       rake
       rdoc
-    json (1.8.1)
     jwt (2.2.1)
     mini_portile2 (2.4.0)
     multi_json (1.14.1)
@@ -48,8 +47,7 @@ GEM
     rack (2.2.3.1)
     rake (12.3.3)
     rchardet (1.8.0)
-    rdoc (4.1.1)
-      json (~> 1.4)
+    rdoc (6.1.2.1)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
@@ -74,7 +72,7 @@ DEPENDENCIES
   jeweler (~> 2.0.1)
   mysql
   rake (~> 12.3.3)
-  rdoc (~> 4.1.1)
+  rdoc (~> 6.1.2)
   rspec (~> 2.14.1)
   sequel (~> 4.10.0)
   simplecov (~> 0.8.1)
