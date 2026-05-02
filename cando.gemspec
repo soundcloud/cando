@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "cando"
-  s.version = "0.2.6"
+  s.version = "0.2.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel Bornkessel"]
-  s.date = "2014-06-02"
+  s.date = "2026-05-02"
   s.description = "CanDo is a small gem to implement a simple user access system based on users, roles & capabilites, where:\n\n    each user can have 0, 1 or many roles\n    each role can have 0, 1 or many capabilites\n\nUsers have capabilities by getting roles assigned (role == collection of capabilities). Within the code, the can helper method can be used to test whether a user has a certain capability or not (see below for a working code example)."
   s.email = "daniel@soundcloud.com"
   s.extra_rdoc_files = [
@@ -47,7 +47,7 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<sequel>, ["~> 4.10.0"])
-      s.add_runtime_dependency(%q<rake>, ">= 10.3.2", "< 13.1.0")
+      s.add_runtime_dependency(%q<rake>, ">= 10.3.2", "< 14")
       s.add_development_dependency(%q<rspec>, ["~> 2.14.1"])
       s.add_development_dependency(%q<rdoc>, ["~> 4.1.1"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
@@ -55,7 +55,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, ["~> 0.8.1"])
     else
       s.add_dependency(%q<sequel>, ["~> 4.10.0"])
-      s.add_dependency(%q<rake>, ">= 10.3.2", "< 13.1.0")
+      s.add_dependency(%q<rake>, ">= 10.3.2", "< 14")
       s.add_dependency(%q<rspec>, ["~> 2.14.1"])
       s.add_dependency(%q<rdoc>, ["~> 4.1.1"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
@@ -64,7 +64,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<sequel>, ["~> 4.10.0"])
-    s.add_dependency(%q<rake>, ">= 10.3.2", "< 13.1.0")
+    s.add_dependency(%q<rake>, ">= 10.3.2", "< 14")
     s.add_dependency(%q<rspec>, ["~> 2.14.1"])
     s.add_dependency(%q<rdoc>, ["~> 4.1.1"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])
