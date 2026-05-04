@@ -25,8 +25,8 @@ Jeweler::Tasks.new do |gem|
     each role can have 0, 1 or many capabilites
 
 Users have capabilities by getting roles assigned (role == collection of capabilities). Within the code, the can helper method can be used to test whether a user has a certain capability or not (see below for a working code example).}
-  gem.email = "daniel@soundcloud.com"
-  gem.authors = ["Daniel Bornkessel"]
+  gem.email = "pedro.henrique@soundcloud.com"
+  gem.authors = ["Pedro Henrique"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new

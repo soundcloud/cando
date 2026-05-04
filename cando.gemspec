@@ -8,10 +8,10 @@ Gem::Specification.new do |s|
   s.version = "0.2.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Daniel Bornkessel"]
+  s.authors = ["Pedro Henrique"]
   s.date = "2026-05-02"
   s.description = "CanDo is a small gem to implement a simple user access system based on users, roles & capabilites, where:\n\n    each user can have 0, 1 or many roles\n    each role can have 0, 1 or many capabilites\n\nUsers have capabilities by getting roles assigned (role == collection of capabilities). Within the code, the can helper method can be used to test whether a user has a certain capability or not (see below for a working code example)."
-  s.email = "daniel@soundcloud.com"
+  s.email = "pedro.henrique@soundcloud.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
