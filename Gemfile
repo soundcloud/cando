@@ -13,7 +13,7 @@ group :development do
   gem "rdoc", "~> 4.1.1"
   gem "bundler", "~> 1.0"
   gem "jeweler", "~> 2.0.1"
-  gem "simplecov", "~> 0.8.1"
+  gem "simplecov", "~> 0.22.0"
 end
 
 group :test do
