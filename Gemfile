@@ -3,7 +3,7 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-gem "sequel", "~> 4.10.0"
+gem "sequel", "~> 4.49.0"
 gem "rake", "~> 12.3.3"
 
 # Add dependencies to develop your gem here.
