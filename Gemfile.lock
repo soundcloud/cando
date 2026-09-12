@@ -70,7 +70,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.0)
+  bundler (~> 2.2, >= 2.2.33)
   jeweler (~> 2.0.1)
   mysql
   rake (~> 12.3.3)
@@ -78,3 +78,6 @@ DEPENDENCIES
   rspec (~> 2.14.1)
   sequel (~> 4.10.0)
   simplecov (~> 0.8.1)
+
+BUNDLED WITH
+  2.7.2
