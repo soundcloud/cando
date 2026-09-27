@@ -11,7 +11,7 @@ gem "rake", "~> 12.3.3"
 group :development do
   gem "rspec", "~> 2.14.1"
   gem "rdoc", "~> 4.1.1"
-  gem "bundler", "~> 1.0"
+  gem "bundler", "~> 2.2", ">= 2.2.33"
   gem "jeweler", "~> 2.0.1"
   gem "simplecov", "~> 0.8.1"
 end
